@@ -1,3 +1,5 @@
+package Transactions;
+
 public class Transaction {
 
     private final String description;

@@ -1,16 +1,26 @@
+package Accounts;
+
+import Accounts.Account;
+import Transactions.Transaction;
+import Utility.RandomStringGenerator;
+import exceptions.InvalidAmountExceptions;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class SavingsAccount implements Account {
+public class CheckingAccount implements Account {
     private String accountNumber;
+
     private String name;
     private double balance;
     private List<Transaction> transactionHistory;
+    boolean isAccountClosed ;
 
-    public SavingsAccount(String accountNumber,String name) {
-        this.accountNumber = accountNumber;
-        this.name = name;
+    public CheckingAccount(String name,boolean isAccountClosed) {
+        this.accountNumber = RandomStringGenerator.generateRandomString(4);
         this.balance = 0;
+        this.name=name;
+        this.isAccountClosed=isAccountClosed;
         this.transactionHistory = new ArrayList<>();
     }
 
@@ -32,7 +42,7 @@ public class SavingsAccount implements Account {
     @Override
     public void deposit(double amount) {
         balance += amount;
-        System.out.println("Dear "+name+" Deposited: " + amount + ". Current Balance is " + getBalance());
+        System.out.println("Deposited: " + amount + ". Current Balance is " + getBalance());
         addTransaction(new Transaction("Deposit", amount));
     }
 
@@ -40,20 +50,20 @@ public class SavingsAccount implements Account {
     public void withdraw(double amount) {
         if (balance >= amount) {
             balance -= amount;
-            System.out.println("Dear "+ name+ " Withdrawn: " + amount + ". Current Balance is " + getBalance());
-            addTransaction(new Transaction("Withdrawal", -amount));
+            System.out.println("Withdrawn: " + amount + ". Current Balance is " + getBalance());
+            addTransaction(new Transaction("Withdrawal", amount));
         } else {
             System.out.println("Insufficient balance for withdrawal.");
         }
     }
 
     @Override
-    public void transfer(Account destinationAccount, double amount) {
+    public void transfer(Account destinationAccount, double amount) throws InvalidAmountExceptions {
         if (balance >= amount) {
             balance -= amount;
             destinationAccount.deposit(amount);
             System.out.println("Transferred: " + amount + " to account " + destinationAccount.getAccountNumber());
-            addTransaction(new Transaction("Transfer to " + destinationAccount.getAccountNumber(), -amount));
+            addTransaction(new Transaction("Transfer to " + destinationAccount.getAccountNumber(), amount));
             destinationAccount.addTransaction(new Transaction("Transfer from " + getAccountNumber(), amount));
         } else {
             System.out.println("Insufficient balance for transfer.");
@@ -67,10 +77,15 @@ public class SavingsAccount implements Account {
 
     @Override
     public void displayStatement() {
-        System.out.println("Account Statement for Account " + getAccountNumber());
+        System.out.println("Accounts.Account Statement for Checking " + getAccountNumber());
         for (Transaction transaction : transactionHistory) {
             System.out.println(transaction.getDescription() + ": " + transaction.getAmount());
         }
         System.out.println("Current Balance: " + getBalance());
+    }
+
+    @Override
+    public boolean isAccountClosed() {
+        return false;
     }
 }
